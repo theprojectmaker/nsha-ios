@@ -1,14 +1,14 @@
 {
   "expo": {
-    "name": "Pennant",
-    "slug": "pennant",
+    "name": "Marquee",
+    "slug": "marquee",
     "version": "1.0.0",
     "orientation": "portrait",
-    "scheme": "pennant",
+    "scheme": "marquee",
     "userInterfaceStyle": "light",
     "backgroundColor": "#ffffff",
     "ios": {
-      "bundleIdentifier": "com.solyapps.pennant",
+      "bundleIdentifier": "com.solyapps.marquee",
       "supportsTablet": true,
       "infoPlist": {
         "ITSAppUsesNonExemptEncryption": false
@@ -36,7 +36,7 @@
     "extra": {
       "router": {},
       "eas": {
-        "projectId": "571bfa7d-3909-45bc-a47c-0fe17f45e98a"
+        "projectId": "0b346ca8-3768-420f-b576-e7350763a4b6"
       }
     },
     "owner": "solomonsasson"

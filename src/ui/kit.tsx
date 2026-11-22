@@ -21,9 +21,9 @@ export function SectionTitle({ children }: { children: React.ReactNode }) {
   return <Text style={[styles.sectionTitle, { color: colors.text }]}>{children}</Text>;
 }
 
-export function Pill({ label, tone = "primary" }: { label: string; tone?: "primary" | "accent" }) {
+export function Pill({ label, tone = "primary" }: { label: string; tone?: "primary" | "accent" | "danger" }) {
   const { colors } = useTheme();
-  const bg = tone === "accent" ? colors.accent : colors.primary;
+  const bg = tone === "accent" ? colors.accent : tone === "danger" ? colors.danger : colors.primary;
   return (
     <View style={[styles.pill, { backgroundColor: bg }]}>
       <Text style={styles.pillText}>{label}</Text>
