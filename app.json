@@ -1,0 +1,44 @@
+{
+  "expo": {
+    "name": "Pennant",
+    "slug": "pennant",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "scheme": "pennant",
+    "userInterfaceStyle": "light",
+    "backgroundColor": "#ffffff",
+    "ios": {
+      "bundleIdentifier": "com.solyapps.pennant",
+      "supportsTablet": true,
+      "infoPlist": {
+        "ITSAppUsesNonExemptEncryption": false
+      }
+    },
+    "web": {
+      "output": "single",
+      "bundler": "metro"
+    },
+    "plugins": [
+      "expo-router",
+      [
+        "expo-splash-screen",
+        {
+          "backgroundColor": "#ffffff",
+          "image": "./assets/icon.png",
+          "imageWidth": 140
+        }
+      ]
+    ],
+    "experiments": {
+      "typedRoutes": false
+    },
+    "icon": "./assets/icon.png",
+    "extra": {
+      "router": {},
+      "eas": {
+        "projectId": "571bfa7d-3909-45bc-a47c-0fe17f45e98a"
+      }
+    },
+    "owner": "solomonsasson"
+  }
+}
