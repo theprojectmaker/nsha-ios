@@ -44,6 +44,14 @@
         "projectId": "c5250115-571a-41ca-9bec-ed3f660eb795"
       }
     },
-    "owner": "solomonsasson"
+    "owner": "solomonsasson",
+    "runtimeVersion": {
+      "policy": "fingerprint"
+    },
+    "updates": {
+      "url": "https://u.expo.dev/c5250115-571a-41ca-9bec-ed3f660eb795",
+      "checkAutomatically": "ON_LOAD",
+      "fallbackToCacheTimeout": 0
+    }
   }
 }
