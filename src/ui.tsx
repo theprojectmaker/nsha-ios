@@ -64,11 +64,13 @@ export function Tag({ label, color = C.black, text = C.onBlack, style }: { label
   );
 }
 
-export function SectionLabel({ title, action, onAction }: { title: string; action?: string; onAction?: () => void }) {
+export function SectionLabel({ title, action, onAction, extra }: { title: string; action?: string; onAction?: () => void; extra?: React.ReactNode }) {
   return (
     <View style={s.section}>
       <View style={s.sectionMark} />
-      <Text style={[T.label, { flex: 1 }]}>{title}</Text>
+      <Text style={T.label}>{title}</Text>
+      {extra}
+      <View style={{ flex: 1 }} />
       {action && onAction ? (
         <Pressable onPress={() => { tap(); onAction(); }} hitSlop={8} accessibilityRole="button">
           <Text style={s.sectionAction}>{action}</Text>

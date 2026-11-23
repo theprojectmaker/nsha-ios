@@ -1,7 +1,8 @@
 import { Ionicons } from '@expo/vector-icons';
 import { router } from 'expo-router';
 import React from 'react';
-import { Image, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { Pressable, ScrollView, StyleSheet, Text, View, useWindowDimensions } from 'react-native';
+import Animated, { FadeInRight } from 'react-native-reanimated';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Svg, { Defs, LinearGradient, Rect, Stop } from 'react-native-svg';
 import { GAMES, sortedPosts, upcomingEvents } from '@/data/seed';
@@ -11,12 +12,17 @@ import { DateBlock, GameCard, Panel, PostItem, Scroller, SectionLabel, Slash, Ta
 
 export default function Home() {
   const insets = useSafeAreaInsets();
+  const { width } = useWindowDimensions();
+  const lionW = Math.min(width - 36, 440);
   const { role } = usePrefs();
   const posts = sortedPosts().filter((p) => visibleTo(role, p.audience));
   const alert = posts.find((p) => p.type === 'alert');
   const next = upcomingEvents().filter((p) => visibleTo(role, p.audience))[0];
   const latest = posts.filter((p) => p.type !== 'alert').slice(0, 3);
   const games = [...GAMES].sort((a, b) => b.date.localeCompare(a.date));
+  const played = GAMES.filter((g) => g.lions !== undefined && g.them !== undefined);
+  const wins = played.filter((g) => g.lions! > g.them!).length;
+  const losses = played.length - wins;
   const now = new Date();
   const heb = hebrewDate(now);
 
@@ -33,7 +39,7 @@ export default function Home() {
           </Defs>
           <Rect x="0" y="0" width="100%" height="100%" fill="url(#hero)" />
         </Svg>
-        <Image source={require('../../../assets/lion.png')} style={s.lion} resizeMode="contain" accessibilityIgnoresInvertColors />
+        <Slash width={260} height={150} bars={3} color={C.white} style={s.heroStripes} />
         <View style={s.heroCol}>
           <View style={s.heroTop}>
             <Text style={s.brand}>NSHA</Text>
@@ -47,6 +53,14 @@ export default function Home() {
             {now.toLocaleDateString(undefined, { weekday: 'long', month: 'long', day: 'numeric' })}
             {heb ? `  ·  ${heb}` : ''}
           </Text>
+          {/* The whole lion, sized to the screen width so it is never cropped. */}
+          <Animated.Image
+            entering={FadeInRight.duration(650).springify().damping(18)}
+            source={require('../../../assets/lion.png')}
+            style={[s.lion, { width: lionW, height: lionW * (452 / 1024) }]}
+            resizeMode="contain"
+            accessibilityLabel="NSHA lion"
+          />
         </View>
       </View>
       <View style={s.band}>
@@ -81,7 +95,7 @@ export default function Home() {
           </>
         ) : null}
 
-        <SectionLabel title="Scoreboard" />
+        <SectionLabel title="Scoreboard" extra={<Tag label={`${wins}-${losses} season`} color={C.black} />} />
       </View>
       <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={s.games}>
         {games.map((g) => <GameCard key={g.id} game={g} />)}
@@ -101,15 +115,16 @@ export default function Home() {
 }
 
 const s = StyleSheet.create({
-  hero: { overflow: 'hidden', paddingBottom: 26, minHeight: 300 },
+  hero: { overflow: 'hidden' },
+  heroStripes: { position: 'absolute', right: -40, top: 40, opacity: 0.07 },
   heroCol: { width: '100%', maxWidth: 640, alignSelf: 'center', paddingHorizontal: 18 },
   heroTop: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginBottom: 26 },
   brand: { fontFamily: F.slant, fontSize: 24, color: C.white, letterSpacing: 1 },
   gear: { width: 36, height: 36, borderRadius: 18, backgroundColor: C.white, alignItems: 'center', justifyContent: 'center' },
-  lion: { position: 'absolute', right: -70, bottom: -4, width: 360, height: 159, opacity: 0.95 },
+  lion: { alignSelf: 'flex-end', marginTop: 14, marginBottom: -2 },
   hello: { fontFamily: F.slantBold, fontSize: 22, color: C.white, textTransform: 'uppercase', letterSpacing: 0.8 },
   lions: { fontFamily: F.slant, fontSize: 92, lineHeight: 88, color: C.white, textTransform: 'uppercase', marginTop: 2, textShadowColor: 'rgba(0,0,0,0.18)', textShadowOffset: { width: 2, height: 3 }, textShadowRadius: 0 },
-  today: { fontSize: 14, fontWeight: '600', color: 'rgba(255,255,255,0.88)', marginTop: 6, maxWidth: 230 },
+  today: { fontSize: 14, fontWeight: '600', color: 'rgba(255,255,255,0.88)', marginTop: 6 },
   band: { height: 12, backgroundColor: C.black, justifyContent: 'center', paddingLeft: 18 },
   col: { width: '100%', maxWidth: 640, alignSelf: 'center', paddingHorizontal: 18 },
   alert: { backgroundColor: C.black, borderRadius: 10, padding: 16, marginTop: 20, gap: 6 },
