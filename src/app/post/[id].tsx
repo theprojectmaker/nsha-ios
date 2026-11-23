@@ -4,8 +4,8 @@ import React, { useState } from 'react';
 import { KeyboardAvoidingView, Platform, Pressable, ScrollView, Share, StyleSheet, Text, TextInput, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { getPost } from '@/data/seed';
-import { C, R, T } from '@/theme';
-import { Card, PostCard, tap } from '@/ui';
+import { C, T } from '@/theme';
+import { Panel, PostItem, SectionLabel, Slash, tap } from '@/ui';
 
 // Opens as Apple's card pop-up (drag down to close).
 export default function PostPage() {
@@ -15,7 +15,6 @@ export default function PostPage() {
   // New comments live only while this card is open; a real server would save them.
   const [mine, setMine] = useState<string[]>([]);
   const [draft, setDraft] = useState('');
-
   const close = () => (router.canGoBack() ? router.back() : router.replace('/'));
 
   if (!post) {
@@ -35,37 +34,33 @@ export default function PostPage() {
 
   return (
     <KeyboardAvoidingView style={s.root} behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
-      <View style={s.grabber} />
-      <View style={s.top}>
-        <Pressable onPress={() => { tap(); Share.share({ message: `${post.title}\n\n${post.body}` }).catch(() => {}); }} hitSlop={8} style={s.circle} accessibilityRole="button" accessibilityLabel="Share">
-          <Ionicons name="share-outline" size={18} color={C.ink} />
-        </Pressable>
-        <Pressable onPress={close} hitSlop={8} style={s.circle} accessibilityRole="button" accessibilityLabel="Close">
-          <Ionicons name="close" size={20} color={C.ink} />
-        </Pressable>
+      <View style={s.bar}>
+        <Slash width={70} height={9} />
+        <View style={{ flexDirection: 'row', gap: 10 }}>
+          <Pressable onPress={() => { tap(); Share.share({ message: `${post.title}\n\n${post.body}` }).catch(() => {}); }} hitSlop={8} style={s.circle} accessibilityRole="button" accessibilityLabel="Share">
+            <Ionicons name="share-outline" size={18} color={C.white} />
+          </Pressable>
+          <Pressable onPress={close} hitSlop={8} style={s.circle} accessibilityRole="button" accessibilityLabel="Close">
+            <Ionicons name="close" size={20} color={C.white} />
+          </Pressable>
+        </View>
       </View>
 
       <ScrollView contentContainerStyle={s.col} keyboardDismissMode="interactive">
-        <PostCard post={post} full />
-        <Text style={[T.h2, { marginTop: 10, marginBottom: 12 }]}>Comments</Text>
-        {post.comments.map((c, i) => (
-          <Card key={i} style={s.comment}>
-            <Text style={T.h3}>{c.author}</Text>
+        <PostItem post={post} full />
+        <SectionLabel title={`Comments (${post.comments.length + mine.length})`} />
+        {[...post.comments, ...mine.map((body) => ({ author: 'You', body }))].map((c, i) => (
+          <Panel key={i} style={s.comment}>
+            <Text style={[T.body, { fontWeight: '700' }]}>{c.author}</Text>
             <Text style={[T.body, { color: C.sub }]}>{c.body}</Text>
-          </Card>
-        ))}
-        {mine.map((c, i) => (
-          <Card key={`m${i}`} style={s.comment}>
-            <Text style={T.h3}>You</Text>
-            <Text style={[T.body, { color: C.sub }]}>{c}</Text>
-          </Card>
+          </Panel>
         ))}
       </ScrollView>
 
       <View style={[s.composer, { paddingBottom: insets.bottom + 10 }]}>
         <TextInput value={draft} onChangeText={setDraft} onSubmitEditing={send} placeholder="Add a comment" placeholderTextColor={C.faint} style={s.input} returnKeyType="send" accessibilityLabel="Add a comment" />
         <Pressable onPress={send} disabled={!draft.trim()} style={[s.send, !draft.trim() && { opacity: 0.4 }]} accessibilityRole="button" accessibilityLabel="Send comment">
-          <Ionicons name="arrow-up" size={19} color={C.white} />
+          <Ionicons name="arrow-up" size={19} color={C.black} />
         </Pressable>
       </View>
     </KeyboardAvoidingView>
@@ -73,13 +68,12 @@ export default function PostPage() {
 }
 
 const s = StyleSheet.create({
-  root: { flex: 1, backgroundColor: C.bg },
-  grabber: { alignSelf: 'center', width: 38, height: 5, borderRadius: 3, backgroundColor: C.line, marginTop: 8 },
-  top: { flexDirection: 'row', justifyContent: 'flex-end', gap: 10, paddingHorizontal: 16, paddingTop: 6 },
-  circle: { width: 34, height: 34, borderRadius: 17, backgroundColor: C.card, alignItems: 'center', justifyContent: 'center' },
-  col: { width: '100%', maxWidth: 640, alignSelf: 'center', paddingHorizontal: 20, paddingTop: 10, paddingBottom: 30 },
-  comment: { padding: 14, marginBottom: 10 },
-  composer: { flexDirection: 'row', alignItems: 'center', gap: 10, paddingHorizontal: 16, paddingTop: 10, borderTopWidth: StyleSheet.hairlineWidth, borderTopColor: C.line, backgroundColor: C.card },
-  input: { flex: 1, height: 42, borderRadius: R.pill, backgroundColor: C.bg, paddingHorizontal: 16, fontSize: 15, color: C.ink },
-  send: { width: 38, height: 38, borderRadius: 19, backgroundColor: C.blue, alignItems: 'center', justifyContent: 'center' },
+  root: { flex: 1, backgroundColor: C.page },
+  bar: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: 18, paddingTop: 14, paddingBottom: 14, backgroundColor: C.black },
+  circle: { width: 34, height: 34, borderRadius: 17, backgroundColor: 'rgba(255,255,255,0.14)', alignItems: 'center', justifyContent: 'center' },
+  col: { width: '100%', maxWidth: 640, alignSelf: 'center', paddingHorizontal: 18, paddingTop: 16, paddingBottom: 30 },
+  comment: { padding: 14, marginBottom: 8 },
+  composer: { flexDirection: 'row', alignItems: 'center', gap: 10, paddingHorizontal: 16, paddingTop: 10, borderTopWidth: StyleSheet.hairlineWidth, borderTopColor: C.rule, backgroundColor: C.surface },
+  input: { flex: 1, height: 42, borderRadius: 8, backgroundColor: C.page, paddingHorizontal: 14, fontSize: 15, color: C.ink },
+  send: { width: 40, height: 40, borderRadius: 8, backgroundColor: C.gold, alignItems: 'center', justifyContent: 'center' },
 });

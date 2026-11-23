@@ -26,6 +26,18 @@ export interface Post {
   comments: { author: string; body: string }[];
 }
 
+export interface Game {
+  id: string;
+  sport: string;
+  team: string; // e.g. "Varsity Boys"
+  opponent: string;
+  home: boolean;
+  date: string; // ISO date
+  lions?: number; // scores only once played
+  them?: number;
+  time?: string; // for upcoming games
+}
+
 export interface Office {
   id: string;
   name: string;

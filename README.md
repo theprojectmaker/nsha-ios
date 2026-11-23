@@ -1,23 +1,28 @@
 # NSHA
 
 iPhone app for **North Shore Hebrew Academy** (Great Neck, NY): school news, important alerts,
-an events calendar, and office contacts, for parents and students. Styled like the CTeen GN app:
-Apple's own tab bar, a floating Liquid Glass header with the lion logo, white cards on a pale
-background, Bricolage headlines, and light/dark mode that follows the phone.
+an events calendar, a Lions scoreboard, and office contacts, for parents and students.
+
+Design ("Varsity Lions"): built from the logo itself. Heavy slanted Barlow Condensed headlines
+like the NSHA lettering, a blue hero on Home with the lion and a giant "LIONS", the slanted gold
+bars from the logo as dividers and markers, black date blocks and scoreboard tiles, flat panels
+with a colored side bar per post type, jersey-patch tags. Apple's own tab bar on iPhone; light
+and dark follow the phone.
 
 ## Screens
 
-- **Home**: the current important notice, the next event (big card with a countdown), quick
-  tiles, and the latest news.
+- **Home**: hero with greeting and the Hebrew date, the current alert, the next event with a
+  countdown, the scoreboard (recent results and the next game), and the latest news.
 - **News**: every post with filters (Announcements, Events, Polls, Photos). Polls can be voted
   on, posts can be liked, and tapping one opens it as an Apple card pop-up with comments.
-- **Calendar**: upcoming events grouped by month.
+- **Calendar**: upcoming events and games grouped by month.
 - **School**: the logo, office contacts (tap to email or call), divisions, and Settings.
 - **Settings**: Parent / Student / Show everything (filters what the feed shows).
 
 ## Content is sample data
 
-Everything in `src/data/seed.ts` (posts, events, office phone numbers and emails) is a
+Everything in `src/data/seed.ts` (posts, events, game scores with generic opponents, office
+phone numbers and emails) is a
 placeholder so the app has something to show. It is not official NSHA information. Before a
 real release the school's actual content needs to come from the school, ideally through a small
 server the office can post to (the CTeen GN app's Cloudflare backend is the model for that).

@@ -1,74 +1,66 @@
-// NSHA colors, sampled from the lion logo: sky blue, gold, and black ink.
-// The palette follows the phone's light/dark setting, picked once at startup.
+// Varsity look built from the NSHA lion logo: sky blue, gold, black, and heavy
+// slanted lettering like the NSHA wordmark. Flat surfaces, no drop shadows.
+// Light/dark follows the phone, picked once at startup.
 import { Appearance } from 'react-native';
 
 const LIGHT = {
-  bg: '#F3F6FA',
-  card: '#FFFFFF',
-  ink: '#0E1520',
-  sub: '#5B6573',
-  faint: '#9AA3AE',
-  line: '#E3E9F0',
-  blue: '#3E8FD0', // NSHA blue, a touch deeper than the logo so text and buttons read well
-  blueLogo: '#56A1DA',
-  blueDeep: '#215F94',
-  bluePale: '#E4F0FA',
-  gold: '#D9A436',
-  goldLogo: '#FDD18A',
-  goldDeep: '#8A6212',
-  goldPale: '#FCF2DC',
-  red: '#D23B3B',
-  redPale: '#FBE5E5',
-  green: '#1E8A5A',
+  page: '#F4F5F7',
+  surface: '#FFFFFF',
+  ink: '#0B0C0F',
+  sub: '#5E6570',
+  faint: '#A2A8B0',
+  rule: '#E2E5EA',
+  blue: '#56A1DA', // logo blue
+  blueDark: '#1F5F96',
+  blueInk: '#2C7BBE', // links, active tab
+  gold: '#F2C14E',
+  goldDark: '#B8861B',
+  black: '#0B0C0F',
+  onBlack: '#FFFFFF',
+  win: '#1E8E5A',
+  loss: '#C63B3B',
+  alert: '#C63B3B',
   white: '#FFFFFF',
-  inverse: '#0E1520',
-  onInverse: '#FFFFFF',
 };
 
 const DARK: typeof LIGHT = {
-  bg: '#0A0F16',
-  card: '#151C26',
-  ink: '#EEF2F7',
-  sub: '#9DA8B5',
-  faint: '#6B7684',
-  line: '#232D3A',
-  blue: '#5DAAE4',
-  blueLogo: '#56A1DA',
-  blueDeep: '#9CCBF0',
-  bluePale: '#122A40',
-  gold: '#F0C266',
-  goldLogo: '#FDD18A',
-  goldDeep: '#F7DDA4',
-  goldPale: '#33270F',
-  red: '#F06464',
-  redPale: '#3A1717',
-  green: '#5CCB97',
+  page: '#08090B',
+  surface: '#14161A',
+  ink: '#F2F3F5',
+  sub: '#9AA1AB',
+  faint: '#5E6570',
+  rule: '#24272D',
+  blue: '#56A1DA',
+  blueDark: '#1A4E7C',
+  blueInk: '#7CB9E8',
+  gold: '#F2C14E',
+  goldDark: '#F2C14E',
+  black: '#000000',
+  onBlack: '#FFFFFF',
+  win: '#4CC98C',
+  loss: '#F06A6A',
+  alert: '#F06A6A',
   white: '#FFFFFF',
-  inverse: '#EEF2F7',
-  onInverse: '#0A0F16',
 };
 
 export const IS_DARK = Appearance.getColorScheme() === 'dark';
 export const C = IS_DARK ? DARK : LIGHT;
 
-export const R = { card: 22, tile: 14, pill: 999 };
-
-// Bricolage Grotesque for headlines (loaded in src/app/_layout.tsx), Apple's system font for everything else.
-export const F = { display: 'BricolageGrotesque_800ExtraBold', bold: 'BricolageGrotesque_700Bold' } as const;
-
-export const shadow = {
-  shadowColor: '#0B1A2B',
-  shadowOpacity: IS_DARK ? 0.35 : 0.06,
-  shadowRadius: 18,
-  shadowOffset: { width: 0, height: 6 },
-  elevation: 2,
+// Barlow Condensed, loaded in src/app/_layout.tsx. Body text stays Apple's system font.
+export const F = {
+  slant: 'BarlowCondensed_900Black_Italic',
+  slantBold: 'BarlowCondensed_800ExtraBold_Italic',
+  cond: 'BarlowCondensed_800ExtraBold',
 } as const;
 
 export const T = {
-  eyebrow: { fontSize: 11, fontWeight: '800', letterSpacing: 0.9, color: C.sub, textTransform: 'uppercase' },
-  h1: { fontSize: 32, lineHeight: 36, fontFamily: F.display, color: C.ink, letterSpacing: -0.8 },
-  h2: { fontSize: 21, fontFamily: F.display, color: C.ink, letterSpacing: -0.3 },
-  h3: { fontSize: 16, fontWeight: '700', color: C.ink },
-  body: { fontSize: 15, lineHeight: 22, color: C.ink },
-  small: { fontSize: 13, lineHeight: 18, color: C.sub },
+  display: { fontFamily: F.slant, fontSize: 52, lineHeight: 50, color: C.ink, textTransform: 'uppercase', letterSpacing: -0.5 },
+  title: { fontFamily: F.slant, fontSize: 40, lineHeight: 42, color: C.ink, textTransform: 'uppercase' },
+  label: { fontFamily: F.slantBold, fontSize: 17, letterSpacing: 1.2, color: C.ink, textTransform: 'uppercase' },
+  head: { fontFamily: F.cond, fontSize: 21, lineHeight: 23, color: C.ink, textTransform: 'uppercase', letterSpacing: 0.2 },
+  body: { fontSize: 15, lineHeight: 21, color: C.ink },
+  meta: { fontSize: 13, lineHeight: 18, color: C.sub },
+  tag: { fontFamily: F.slantBold, fontSize: 13, letterSpacing: 1.4, textTransform: 'uppercase' },
 } as const;
+
+export const RADIUS = 10;

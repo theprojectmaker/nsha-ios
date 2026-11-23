@@ -8,7 +8,7 @@ import { WebTabs } from '@/webTabs';
 export default function TabsLayout() {
   if (Platform.OS === 'web') return <WebTabs />;
   return (
-    <NativeTabs tintColor={C.blue} minimizeBehavior="onScrollDown" labelStyle={{ fontWeight: '600' }}>
+    <NativeTabs tintColor={C.blueInk} minimizeBehavior="onScrollDown" labelStyle={{ fontWeight: '600' }}>
       <NativeTabs.Trigger name="index">
         <NativeTabs.Trigger.Icon sf={{ default: 'house', selected: 'house.fill' }} />
         <NativeTabs.Trigger.Label>Home</NativeTabs.Trigger.Label>

@@ -1,7 +1,15 @@
 // SAMPLE content so the app has something to show. None of it is official NSHA
 // information: names, phone numbers and events are placeholders for the school
 // to replace (a real version would load this from a server the office edits).
-import type { Office, Post } from './types';
+import type { Game, Office, Post } from './types';
+
+// Opponents are left generic on purpose: these are sample results, not real games.
+export const GAMES: Game[] = [
+  { id: 'g1', sport: 'Basketball', team: 'Varsity Boys', opponent: 'Opponent A', home: true, date: '2026-11-18', lions: 58, them: 51 },
+  { id: 'g2', sport: 'Volleyball', team: 'Varsity Girls', opponent: 'Opponent B', home: false, date: '2026-11-16', lions: 3, them: 1 },
+  { id: 'g3', sport: 'Hockey', team: 'Varsity Boys', opponent: 'Opponent C', home: false, date: '2026-11-13', lions: 2, them: 4 },
+  { id: 'g4', sport: 'Basketball', team: 'Varsity Girls', opponent: 'Opponent D', home: true, date: '2026-11-24', time: '6:00 PM' },
+];
 
 export const POSTS: Post[] = [
   {

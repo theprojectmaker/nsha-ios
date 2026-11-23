@@ -1,94 +1,123 @@
 import { Ionicons } from '@expo/vector-icons';
 import { router } from 'expo-router';
 import React from 'react';
-import { Image, Pressable, StyleSheet, Text, View } from 'react-native';
-import { sortedPosts, upcomingEvents } from '@/data/seed';
+import { Image, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import Svg, { Defs, LinearGradient, Rect, Stop } from 'react-native-svg';
+import { GAMES, sortedPosts, upcomingEvents } from '@/data/seed';
 import { usePrefs, visibleTo } from '@/prefs';
-import { C, F, R, T, shadow } from '@/theme';
-import { Card, DateTile, IconTile, PostCard, Screen, SectionHeader, inDays, longDate, tap, type IconName } from '@/ui';
+import { C, F, T } from '@/theme';
+import { DateBlock, GameCard, Panel, PostItem, Scroller, SectionLabel, Slash, Tag, greeting, hebrewDate, inDays, longDate, tap } from '@/ui';
 
 export default function Home() {
+  const insets = useSafeAreaInsets();
   const { role } = usePrefs();
   const posts = sortedPosts().filter((p) => visibleTo(role, p.audience));
   const alert = posts.find((p) => p.type === 'alert');
   const next = upcomingEvents().filter((p) => visibleTo(role, p.audience))[0];
-  const latest = posts.filter((p) => p.type !== 'alert').slice(0, 2);
+  const latest = posts.filter((p) => p.type !== 'alert').slice(0, 3);
+  const games = [...GAMES].sort((a, b) => b.date.localeCompare(a.date));
+  const now = new Date();
+  const heb = hebrewDate(now);
 
   return (
-    <Screen>
-      {alert ? (
-        <Pressable onPress={() => { tap(); router.push(`/post/${alert.id}`); }} accessibilityRole="button" style={({ pressed }) => [s.alert, pressed && { opacity: 0.8 }]}>
-          <Ionicons name="alert-circle" size={22} color={C.red} />
-          <View style={{ flex: 1 }}>
+    <Scroller top={0} bottom={insets.bottom} pad={false}>
+      {/* Hero */}
+      <View style={[s.hero, { paddingTop: insets.top + 12 }]}>
+        <Svg width="100%" height="100%" style={StyleSheet.absoluteFill} preserveAspectRatio="none">
+          <Defs>
+            <LinearGradient id="hero" x1="0" y1="0" x2="1" y2="1">
+              <Stop offset="0" stopColor="#2F7DC0" />
+              <Stop offset="1" stopColor={C.blue} />
+            </LinearGradient>
+          </Defs>
+          <Rect x="0" y="0" width="100%" height="100%" fill="url(#hero)" />
+        </Svg>
+        <Image source={require('../../../assets/lion.png')} style={s.lion} resizeMode="contain" accessibilityIgnoresInvertColors />
+        <View style={s.heroCol}>
+          <View style={s.heroTop}>
+            <Text style={s.brand}>NSHA</Text>
+            <Pressable onPress={() => { tap(); router.push('/settings'); }} hitSlop={8} accessibilityRole="button" accessibilityLabel="Settings" style={({ pressed }) => [s.gear, pressed && { opacity: 0.6 }]}>
+              <Ionicons name="person" size={17} color={C.blueDark} />
+            </Pressable>
+          </View>
+          <Text style={s.hello}>{greeting(now)},</Text>
+          <Text style={s.lions}>Lions</Text>
+          <Text style={s.today}>
+            {now.toLocaleDateString(undefined, { weekday: 'long', month: 'long', day: 'numeric' })}
+            {heb ? `  ·  ${heb}` : ''}
+          </Text>
+        </View>
+      </View>
+      <View style={s.band}>
+        <Slash width={150} height={12} color={C.gold} bars={4} />
+      </View>
+
+      <View style={s.col}>
+        {alert ? (
+          <Pressable onPress={() => { tap(); router.push(`/post/${alert.id}`); }} accessibilityRole="button" accessibilityLabel={alert.title} style={({ pressed }) => [s.alert, pressed && { opacity: 0.8 }]}>
+            <Tag label="Alert" color={C.alert} />
             <Text style={s.alertTitle}>{alert.title}</Text>
             <Text style={s.alertBody} numberOfLines={2}>{alert.body}</Text>
-          </View>
-          <Ionicons name="chevron-forward" size={17} color={C.red} />
-        </Pressable>
-      ) : null}
+          </Pressable>
+        ) : null}
 
-      {next ? (
-        <>
-          <Text style={[T.eyebrow, { marginBottom: 10 }]}>Up next</Text>
-          <Card onPress={() => router.push(`/post/${next.id}`)} label={next.title} style={s.next}>
-            <View style={s.nextTop}>
-              <DateTile iso={next.eventDate!} size={64} />
-              <View style={s.nextWhen}>
-                <Text style={s.nextWhenText}>{inDays(next.eventDate!)}</Text>
-              </View>
-            </View>
-            <Text style={s.nextTitle}>{next.title}</Text>
-            <Text style={T.small}>{longDate(next.eventDate!)}{next.eventTime ? ` · ${next.eventTime}` : ''}</Text>
-            {next.eventLocation ? (
-              <View style={s.nextPlace}>
-                <Ionicons name="location-outline" size={15} color={C.sub} />
-                <Text style={T.small}>{next.eventLocation}</Text>
-              </View>
-            ) : null}
-          </Card>
-        </>
-      ) : null}
+        {next ? (
+          <>
+            <SectionLabel title="Next up" action="Calendar" onAction={() => router.navigate('/calendar')} />
+            <Pressable onPress={() => { tap(); router.push(`/post/${next.id}`); }} accessibilityRole="button" accessibilityLabel={next.title}>
+              {({ pressed }) => (
+                <Panel accent={C.gold} style={[s.next, pressed && { opacity: 0.7 }]}>
+                  <DateBlock iso={next.eventDate!} size={74} />
+                  <View style={{ flex: 1 }}>
+                    <Text style={s.nextTitle}>{next.title}</Text>
+                    <Text style={T.meta}>{longDate(next.eventDate!)}{next.eventTime ? ` · ${next.eventTime}` : ''}</Text>
+                    {next.eventLocation ? <Text style={T.meta}>{next.eventLocation}</Text> : null}
+                    <Tag label={inDays(next.eventDate!)} color={C.gold} text={C.black} style={{ marginTop: 8 }} />
+                  </View>
+                </Panel>
+              )}
+            </Pressable>
+          </>
+        ) : null}
 
-      <View style={s.quick}>
-        <Quick icon="calendar-outline" label="Calendar" onPress={() => router.navigate('/calendar')} />
-        <Quick icon="newspaper-outline" label="News" onPress={() => router.navigate('/news')} />
-        <Quick icon="call-outline" label="Contact" onPress={() => router.navigate('/school')} />
+        <SectionLabel title="Scoreboard" />
       </View>
+      <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={s.games}>
+        {games.map((g) => <GameCard key={g.id} game={g} />)}
+      </ScrollView>
 
-      <SectionHeader title="Latest news" action="See all" onAction={() => router.navigate('/news')} />
-      {latest.map((p) => <PostCard key={p.id} post={p} />)}
+      <View style={s.col}>
+        <SectionLabel title="Latest" action="All news" onAction={() => router.navigate('/news')} />
+        {latest.map((p) => <PostItem key={p.id} post={p} />)}
 
-      <View style={s.footer}>
-        <Image source={require('../../../assets/nsha-logo.png')} style={s.footLogo} resizeMode="contain" />
-        <Text style={s.footText}>Go Lions</Text>
+        <View style={s.footer}>
+          <Slash width={84} height={9} />
+          <Text style={s.go}>Go Lions</Text>
+        </View>
       </View>
-    </Screen>
-  );
-}
-
-function Quick({ icon, label, onPress }: { icon: IconName; label: string; onPress: () => void }) {
-  return (
-    <Pressable onPress={() => { tap(); onPress(); }} accessibilityRole="button" accessibilityLabel={label} style={({ pressed }) => [s.quickTile, pressed && { opacity: 0.7, transform: [{ scale: 0.98 }] }]}>
-      <IconTile icon={icon} size={40} />
-      <Text style={s.quickText}>{label}</Text>
-    </Pressable>
+    </Scroller>
   );
 }
 
 const s = StyleSheet.create({
-  alert: { flexDirection: 'row', alignItems: 'center', gap: 12, padding: 16, borderRadius: R.card, backgroundColor: C.redPale, marginBottom: 24 },
-  alertTitle: { fontSize: 15, fontWeight: '700', color: C.ink },
-  alertBody: { fontSize: 13, lineHeight: 18, color: C.sub, marginTop: 2 },
-  next: { padding: 20, marginBottom: 24 },
-  nextTop: { flexDirection: 'row', alignItems: 'flex-start', justifyContent: 'space-between', marginBottom: 16 },
-  nextWhen: { backgroundColor: C.goldPale, paddingHorizontal: 12, paddingVertical: 6, borderRadius: R.pill },
-  nextWhenText: { fontSize: 13, fontWeight: '700', color: C.goldDeep },
-  nextTitle: { fontSize: 26, lineHeight: 30, fontFamily: F.display, color: C.ink, letterSpacing: -0.5, marginBottom: 4 },
-  nextPlace: { flexDirection: 'row', alignItems: 'center', gap: 4, marginTop: 6 },
-  quick: { flexDirection: 'row', gap: 12, marginBottom: 20 },
-  quickTile: { flex: 1, alignItems: 'center', gap: 8, paddingVertical: 16, borderRadius: R.card, backgroundColor: C.card, ...shadow },
-  quickText: { fontSize: 13, fontWeight: '600', color: C.ink },
-  footer: { alignItems: 'center', marginTop: 24, opacity: 0.55 },
-  footLogo: { width: 90, height: 62 },
-  footText: { ...T.eyebrow, marginTop: 6 },
+  hero: { overflow: 'hidden', paddingBottom: 26, minHeight: 300 },
+  heroCol: { width: '100%', maxWidth: 640, alignSelf: 'center', paddingHorizontal: 18 },
+  heroTop: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginBottom: 26 },
+  brand: { fontFamily: F.slant, fontSize: 24, color: C.white, letterSpacing: 1 },
+  gear: { width: 36, height: 36, borderRadius: 18, backgroundColor: C.white, alignItems: 'center', justifyContent: 'center' },
+  lion: { position: 'absolute', right: -70, bottom: -4, width: 360, height: 159, opacity: 0.95 },
+  hello: { fontFamily: F.slantBold, fontSize: 22, color: C.white, textTransform: 'uppercase', letterSpacing: 0.8 },
+  lions: { fontFamily: F.slant, fontSize: 92, lineHeight: 88, color: C.white, textTransform: 'uppercase', marginTop: 2, textShadowColor: 'rgba(0,0,0,0.18)', textShadowOffset: { width: 2, height: 3 }, textShadowRadius: 0 },
+  today: { fontSize: 14, fontWeight: '600', color: 'rgba(255,255,255,0.88)', marginTop: 6, maxWidth: 230 },
+  band: { height: 12, backgroundColor: C.black, justifyContent: 'center', paddingLeft: 18 },
+  col: { width: '100%', maxWidth: 640, alignSelf: 'center', paddingHorizontal: 18 },
+  alert: { backgroundColor: C.black, borderRadius: 10, padding: 16, marginTop: 20, gap: 6 },
+  alertTitle: { fontFamily: F.cond, fontSize: 22, lineHeight: 24, color: C.white, textTransform: 'uppercase' },
+  alertBody: { fontSize: 14, lineHeight: 19, color: 'rgba(255,255,255,0.7)' },
+  next: { flexDirection: 'row', gap: 14, padding: 16, paddingLeft: 21 },
+  nextTitle: { fontFamily: F.slant, fontSize: 30, lineHeight: 30, color: C.ink, textTransform: 'uppercase', marginBottom: 4 },
+  games: { paddingHorizontal: 18 },
+  footer: { alignItems: 'center', gap: 8, marginTop: 28 },
+  go: { fontFamily: F.slant, fontSize: 26, color: C.faint, textTransform: 'uppercase', letterSpacing: 1 },
 });

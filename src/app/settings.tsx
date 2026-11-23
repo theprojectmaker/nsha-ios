@@ -4,7 +4,7 @@ import React from 'react';
 import { Text } from 'react-native';
 import { usePrefs, type Role } from '@/prefs';
 import { C, T } from '@/theme';
-import { Card, Row, Screen, SectionHeader } from '@/ui';
+import { Page, Panel, Row, SectionLabel } from '@/ui';
 
 const ROLES: { id: Role; title: string; detail: string }[] = [
   { id: 'parent', title: 'Parent', detail: 'Parent and school-wide posts' },
@@ -15,9 +15,9 @@ const ROLES: { id: Role; title: string; detail: string }[] = [
 export default function Settings() {
   const { role, setRole } = usePrefs();
   return (
-    <Screen title="Settings" back>
-      <SectionHeader title="I am a" />
-      <Card style={{ paddingVertical: 4 }}>
+    <Page title="Settings" back>
+      <SectionLabel title="I am a" />
+      <Panel>
         {ROLES.map((r, i) => (
           <Row
             key={r.id}
@@ -25,19 +25,17 @@ export default function Settings() {
             detail={r.detail}
             onPress={() => setRole(r.id)}
             last={i === ROLES.length - 1}
-            right={role === r.id ? <Ionicons name="checkmark-circle" size={22} color={C.blue} /> : <Ionicons name="ellipse-outline" size={22} color={C.line} />}
+            right={<Ionicons name={role === r.id ? 'checkmark-circle' : 'ellipse-outline'} size={22} color={role === r.id ? C.gold : C.faint} />}
           />
         ))}
-      </Card>
+      </Panel>
 
-      <SectionHeader title="Appearance" />
-      <Card style={{ paddingVertical: 4 }}>
-        <Row icon="contrast-outline" title="Light and dark" detail="Follows your iPhone's appearance setting" last />
-      </Card>
+      <SectionLabel title="Appearance" />
+      <Panel>
+        <Row icon="contrast" title="Light and dark" detail="Follows your iPhone's appearance setting" last />
+      </Panel>
 
-      <Text style={[T.small, { textAlign: 'center', marginTop: 16 }]}>
-        NSHA {Constants.expoConfig?.version ?? ''}
-      </Text>
-    </Screen>
+      <Text style={[T.meta, { textAlign: 'center', marginTop: 18 }]}>NSHA {Constants.expoConfig?.version ?? ''}</Text>
+    </Page>
   );
 }
