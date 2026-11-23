@@ -43,6 +43,12 @@ jobs:
           npx --yes eas-cli@latest whoami
       - name: Build the app on this Mac (eas build --local)
         run: npx --yes eas-cli@latest build --platform ios --profile production --local --non-interactive --output "$RUNNER_TEMP/app.ipa"
+      - name: Keep the app file
+        uses: actions/upload-artifact@v4
+        with:
+          name: app-ipa
+          path: ${{ runner.temp }}/app.ipa
+          retention-days: 14
       - name: Send to TestFlight
         if: ${{ inputs.submit }}
         run: npx --yes eas-cli@latest submit --platform ios --profile production --path "$RUNNER_TEMP/app.ipa" --non-interactive --wait
