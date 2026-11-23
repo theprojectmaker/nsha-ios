@@ -7,10 +7,10 @@ import { useCallback, useEffect, useState } from "react";
 import type { PollOption } from "./types";
 
 function likeKey(postId: string) {
-  return `marquee.like.${postId}`;
+  return `nsha.like.${postId}`;
 }
 function pollKey(postId: string) {
-  return `marquee.poll.${postId}`;
+  return `nsha.poll.${postId}`;
 }
 
 export function useReaction(postId: string, baseLikes: number) {

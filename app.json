@@ -1,14 +1,14 @@
 {
   "expo": {
-    "name": "Marquee",
-    "slug": "marquee",
+    "name": "NSHA",
+    "slug": "nsha",
     "version": "1.0.0",
     "orientation": "portrait",
-    "scheme": "marquee",
-    "userInterfaceStyle": "light",
-    "backgroundColor": "#ffffff",
+    "scheme": "nsha",
+    "userInterfaceStyle": "automatic",
+    "backgroundColor": "#F3F6FA",
     "ios": {
-      "bundleIdentifier": "com.solyapps.marquee",
+      "bundleIdentifier": "com.solyapps.nsha",
       "supportsTablet": true,
       "infoPlist": {
         "ITSAppUsesNonExemptEncryption": false
@@ -16,16 +16,21 @@
     },
     "web": {
       "output": "single",
-      "bundler": "metro"
+      "bundler": "metro",
+      "name": "NSHA"
     },
     "plugins": [
       "expo-router",
       [
         "expo-splash-screen",
         {
-          "backgroundColor": "#ffffff",
-          "image": "./assets/icon.png",
-          "imageWidth": 140
+          "backgroundColor": "#FFFFFF",
+          "image": "./assets/nsha-logo.png",
+          "imageWidth": 220,
+          "dark": {
+            "backgroundColor": "#0A0F16",
+            "image": "./assets/nsha-logo.png"
+          }
         }
       ]
     ],
@@ -36,7 +41,7 @@
     "extra": {
       "router": {},
       "eas": {
-        "projectId": "0b346ca8-3768-420f-b576-e7350763a4b6"
+        "projectId": "c5250115-571a-41ca-9bec-ed3f660eb795"
       }
     },
     "owner": "solomonsasson"

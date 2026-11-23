@@ -1,114 +1,85 @@
-import { Ionicons } from "@expo/vector-icons";
-import * as Haptics from "expo-haptics";
-import { Stack, useLocalSearchParams } from "expo-router";
-import React, { useState } from "react";
-import { KeyboardAvoidingView, Platform, Pressable, ScrollView, Share, StyleSheet, Text, TextInput, View } from "react-native";
-import { getPost } from "@/data/seed";
-import { useReaction } from "@/data/interactions";
-import { useTheme } from "@/theme/ThemeContext";
-import { Card, Screen } from "@/ui/kit";
+import { Ionicons } from '@expo/vector-icons';
+import { router, useLocalSearchParams } from 'expo-router';
+import React, { useState } from 'react';
+import { KeyboardAvoidingView, Platform, Pressable, ScrollView, Share, StyleSheet, Text, TextInput, View } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { getPost } from '@/data/seed';
+import { C, R, T } from '@/theme';
+import { Card, PostCard, tap } from '@/ui';
 
-export default function PostDetail() {
+// Opens as Apple's card pop-up (drag down to close).
+export default function PostPage() {
   const { id } = useLocalSearchParams<{ id: string }>();
-  const { colors } = useTheme();
   const post = getPost(id);
+  const insets = useSafeAreaInsets();
+  // New comments live only while this card is open; a real server would save them.
+  const [mine, setMine] = useState<string[]>([]);
+  const [draft, setDraft] = useState('');
 
-  // Comments added here are in-memory only for this screen visit — a real
-  // app would post these to a backend and refetch; this demo keeps the data
-  // layer static, so new comments don't survive leaving the screen.
-  const [extraComments, setExtraComments] = useState<{ author: string; body: string }[]>([]);
-  const [draft, setDraft] = useState("");
-  const { liked, count, toggle } = useReaction(post?.id ?? "missing", post?.baseLikes ?? 0);
+  const close = () => (router.canGoBack() ? router.back() : router.replace('/'));
 
   if (!post) {
     return (
-      <Screen>
-        <Text style={{ color: colors.text, margin: 16 }}>Post not found.</Text>
-      </Screen>
+      <View style={[s.root, { alignItems: 'center', justifyContent: 'center' }]}>
+        <Text style={T.body}>This post is no longer available.</Text>
+      </View>
     );
   }
 
-  const onShare = () => {
-    Share.share({ message: `${post.title}\n\n${post.body}` }).catch(() => {});
-  };
-
-  const onSend = () => {
+  const send = () => {
     if (!draft.trim()) return;
-    Haptics.selectionAsync().catch(() => {});
-    setExtraComments((c) => [...c, { author: "You", body: draft.trim() }]);
-    setDraft("");
+    tap();
+    setMine((m) => [...m, draft.trim()]);
+    setDraft('');
   };
 
   return (
-    <Screen>
-      <Stack.Screen options={{ headerShown: true, title: post.title, headerTintColor: colors.primary }} />
-      <KeyboardAvoidingView style={{ flex: 1 }} behavior={Platform.OS === "ios" ? "padding" : undefined}>
-        <ScrollView contentContainerStyle={styles.list}>
-          <Card>
-            <Text style={[styles.title, { color: colors.text }]}>{post.title}</Text>
-            <Text style={[styles.author, { color: colors.muted }]}>
-              {post.author} · {new Date(post.postedAt + "T00:00:00").toLocaleDateString()}
-            </Text>
-            <Text style={[styles.body, { color: colors.text }]}>{post.body}</Text>
+    <KeyboardAvoidingView style={s.root} behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
+      <View style={s.grabber} />
+      <View style={s.top}>
+        <Pressable onPress={() => { tap(); Share.share({ message: `${post.title}\n\n${post.body}` }).catch(() => {}); }} hitSlop={8} style={s.circle} accessibilityRole="button" accessibilityLabel="Share">
+          <Ionicons name="share-outline" size={18} color={C.ink} />
+        </Pressable>
+        <Pressable onPress={close} hitSlop={8} style={s.circle} accessibilityRole="button" accessibilityLabel="Close">
+          <Ionicons name="close" size={20} color={C.ink} />
+        </Pressable>
+      </View>
 
-            <View style={[styles.footer, { borderTopColor: colors.border }]}>
-              <Pressable
-                onPress={() => {
-                  Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light).catch(() => {});
-                  toggle();
-                }}
-                style={styles.likeRow}
-              >
-                <Ionicons name={liked ? "heart" : "heart-outline"} size={20} color={liked ? colors.danger : colors.muted} />
-                <Text style={[styles.likeCount, { color: liked ? colors.danger : colors.muted }]}>{count} likes</Text>
-              </Pressable>
-              <Pressable onPress={onShare} style={styles.likeRow}>
-                <Ionicons name="share-outline" size={20} color={colors.primary} />
-                <Text style={[styles.likeCount, { color: colors.primary }]}>Share</Text>
-              </Pressable>
-            </View>
+      <ScrollView contentContainerStyle={s.col} keyboardDismissMode="interactive">
+        <PostCard post={post} full />
+        <Text style={[T.h2, { marginTop: 10, marginBottom: 12 }]}>Comments</Text>
+        {post.comments.map((c, i) => (
+          <Card key={i} style={s.comment}>
+            <Text style={T.h3}>{c.author}</Text>
+            <Text style={[T.body, { color: C.sub }]}>{c.body}</Text>
           </Card>
+        ))}
+        {mine.map((c, i) => (
+          <Card key={`m${i}`} style={s.comment}>
+            <Text style={T.h3}>You</Text>
+            <Text style={[T.body, { color: C.sub }]}>{c}</Text>
+          </Card>
+        ))}
+      </ScrollView>
 
-          <Text style={[styles.commentsHeader, { color: colors.text }]}>
-            Comments ({post.comments.length + extraComments.length})
-          </Text>
-          {[...post.comments, ...extraComments].map((c, i) => (
-            <Card key={i}>
-              <Text style={[styles.commentAuthor, { color: colors.text }]}>{c.author}</Text>
-              <Text style={[styles.commentBody, { color: colors.muted }]}>{c.body}</Text>
-            </Card>
-          ))}
-        </ScrollView>
-
-        <View style={[styles.composer, { backgroundColor: colors.surface, borderTopColor: colors.border }]}>
-          <TextInput
-            value={draft}
-            onChangeText={setDraft}
-            placeholder="Add a comment…"
-            placeholderTextColor={colors.muted}
-            style={[styles.input, { color: colors.text, borderColor: colors.border }]}
-          />
-          <Pressable onPress={onSend} style={[styles.sendBtn, { backgroundColor: colors.primary }]}>
-            <Ionicons name="send" size={16} color="#fff" />
-          </Pressable>
-        </View>
-      </KeyboardAvoidingView>
-    </Screen>
+      <View style={[s.composer, { paddingBottom: insets.bottom + 10 }]}>
+        <TextInput value={draft} onChangeText={setDraft} onSubmitEditing={send} placeholder="Add a comment" placeholderTextColor={C.faint} style={s.input} returnKeyType="send" accessibilityLabel="Add a comment" />
+        <Pressable onPress={send} disabled={!draft.trim()} style={[s.send, !draft.trim() && { opacity: 0.4 }]} accessibilityRole="button" accessibilityLabel="Send comment">
+          <Ionicons name="arrow-up" size={19} color={C.white} />
+        </Pressable>
+      </View>
+    </KeyboardAvoidingView>
   );
 }
 
-const styles = StyleSheet.create({
-  list: { padding: 16, paddingBottom: 90, gap: 12 },
-  title: { fontSize: 20, fontWeight: "700", marginBottom: 4 },
-  author: { fontSize: 13, marginBottom: 12 },
-  body: { fontSize: 15, lineHeight: 22 },
-  footer: { flexDirection: "row", gap: 24, marginTop: 14, paddingTop: 12, borderTopWidth: 1 },
-  likeRow: { flexDirection: "row", alignItems: "center", gap: 6 },
-  likeCount: { fontSize: 14, fontWeight: "700" },
-  commentsHeader: { fontSize: 16, fontWeight: "700", marginTop: 4 },
-  commentAuthor: { fontSize: 14, fontWeight: "700", marginBottom: 2 },
-  commentBody: { fontSize: 14, lineHeight: 19 },
-  composer: { flexDirection: "row", gap: 10, padding: 12, borderTopWidth: 1, alignItems: "center" },
-  input: { flex: 1, borderWidth: 1, borderRadius: 20, paddingHorizontal: 14, paddingVertical: 8, fontSize: 14 },
-  sendBtn: { width: 36, height: 36, borderRadius: 18, alignItems: "center", justifyContent: "center" },
+const s = StyleSheet.create({
+  root: { flex: 1, backgroundColor: C.bg },
+  grabber: { alignSelf: 'center', width: 38, height: 5, borderRadius: 3, backgroundColor: C.line, marginTop: 8 },
+  top: { flexDirection: 'row', justifyContent: 'flex-end', gap: 10, paddingHorizontal: 16, paddingTop: 6 },
+  circle: { width: 34, height: 34, borderRadius: 17, backgroundColor: C.card, alignItems: 'center', justifyContent: 'center' },
+  col: { width: '100%', maxWidth: 640, alignSelf: 'center', paddingHorizontal: 20, paddingTop: 10, paddingBottom: 30 },
+  comment: { padding: 14, marginBottom: 10 },
+  composer: { flexDirection: 'row', alignItems: 'center', gap: 10, paddingHorizontal: 16, paddingTop: 10, borderTopWidth: StyleSheet.hairlineWidth, borderTopColor: C.line, backgroundColor: C.card },
+  input: { flex: 1, height: 42, borderRadius: R.pill, backgroundColor: C.bg, paddingHorizontal: 16, fontSize: 15, color: C.ink },
+  send: { width: 38, height: 38, borderRadius: 19, backgroundColor: C.blue, alignItems: 'center', justifyContent: 'center' },
 });

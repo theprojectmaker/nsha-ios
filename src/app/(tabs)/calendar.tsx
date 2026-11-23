@@ -1,79 +1,44 @@
-import { Ionicons } from "@expo/vector-icons";
-import React, { useMemo } from "react";
-import { FlatList, StyleSheet, Text, View } from "react-native";
-import { postsForSchool } from "@/data/seed";
-import { useTheme } from "@/theme/ThemeContext";
-import { Card, Screen, SectionTitle } from "@/ui/kit";
-import { SchoolHeader } from "@/ui/SchoolHeader";
+import { router } from 'expo-router';
+import React from 'react';
+import { StyleSheet, Text, View } from 'react-native';
+import { upcomingEvents } from '@/data/seed';
+import type { Post } from '@/data/types';
+import { usePrefs, visibleTo } from '@/prefs';
+import { C, T } from '@/theme';
+import { Card, DateTile, Screen, inDays } from '@/ui';
 
-function formatDate(iso: string) {
-  return new Date(iso + "T00:00:00").toLocaleDateString(undefined, {
-    weekday: "short",
-    month: "short",
-    day: "numeric",
-  });
-}
-
-export default function CalendarScreen() {
-  const { school, colors } = useTheme();
-
-  const events = useMemo(
-    () =>
-      postsForSchool(school.id)
-        .filter((p) => p.type === "event" && p.eventDate)
-        .sort((a, b) => a.eventDate!.localeCompare(b.eventDate!)),
-    [school.id]
-  );
+export default function Calendar() {
+  const { role } = usePrefs();
+  const events = upcomingEvents().filter((p) => visibleTo(role, p.audience));
+  const months = new Map<string, Post[]>();
+  for (const e of events) {
+    const key = new Date(e.eventDate! + 'T00:00:00').toLocaleDateString(undefined, { month: 'long', year: 'numeric' });
+    months.set(key, [...(months.get(key) ?? []), e]);
+  }
 
   return (
-    <Screen>
-      <FlatList
-        data={events}
-        keyExtractor={(e) => e.id}
-        ListHeaderComponent={
-          <>
-            <SchoolHeader subtitle="Upcoming events" />
-            <SectionTitle>Calendar</SectionTitle>
-          </>
-        }
-        contentContainerStyle={styles.list}
-        renderItem={({ item }) => (
-          <Card>
-            <View style={styles.row}>
-              <View style={[styles.dateBadge, { backgroundColor: colors.primary }]}>
-                <Text style={styles.dateBadgeDay}>{new Date(item.eventDate! + "T00:00:00").getDate()}</Text>
-                <Text style={styles.dateBadgeMonth}>
-                  {new Date(item.eventDate! + "T00:00:00").toLocaleDateString(undefined, { month: "short" })}
-                </Text>
+    <Screen title="Calendar">
+      {[...months.entries()].map(([month, list]) => (
+        <View key={month} style={{ marginBottom: 10 }}>
+          <Text style={[T.eyebrow, { marginBottom: 10 }]}>{month}</Text>
+          {list.map((e) => (
+            <Card key={e.id} onPress={() => router.push(`/post/${e.id}`)} label={e.title} style={s.row}>
+              <DateTile iso={e.eventDate!} />
+              <View style={{ flex: 1 }}>
+                <Text style={T.h3}>{e.title}</Text>
+                <Text style={T.small}>{[e.eventTime, e.eventLocation].filter(Boolean).join(' · ')}</Text>
               </View>
-              <View style={styles.info}>
-                <Text style={[styles.title, { color: colors.text }]}>{item.title}</Text>
-                <Text style={[styles.meta, { color: colors.muted }]}>
-                  {formatDate(item.eventDate!)} · {item.eventLocation}
-                </Text>
-              </View>
-            </View>
-          </Card>
-        )}
-        ListEmptyComponent={
-          <View style={styles.empty}>
-            <Ionicons name="calendar-outline" size={28} color={colors.muted} />
-            <Text style={{ color: colors.muted, marginTop: 8 }}>No upcoming events.</Text>
-          </View>
-        }
-      />
+              <Text style={s.when}>{inDays(e.eventDate!)}</Text>
+            </Card>
+          ))}
+        </View>
+      ))}
+      {events.length === 0 ? <Text style={[T.small, { textAlign: 'center', marginTop: 30 }]}>No upcoming events.</Text> : null}
     </Screen>
   );
 }
 
-const styles = StyleSheet.create({
-  list: { paddingBottom: 24 },
-  row: { flexDirection: "row", alignItems: "center", gap: 14 },
-  dateBadge: { width: 52, height: 52, borderRadius: 10, alignItems: "center", justifyContent: "center" },
-  dateBadgeDay: { color: "#fff", fontSize: 18, fontWeight: "700" },
-  dateBadgeMonth: { color: "#ffffffcc", fontSize: 11, textTransform: "uppercase" },
-  info: { flex: 1 },
-  title: { fontSize: 16, fontWeight: "700" },
-  meta: { fontSize: 13, marginTop: 2 },
-  empty: { alignItems: "center", marginTop: 40 },
+const s = StyleSheet.create({
+  row: { flexDirection: 'row', alignItems: 'center', gap: 14, padding: 14 },
+  when: { fontSize: 12, fontWeight: '700', color: C.blue },
 });

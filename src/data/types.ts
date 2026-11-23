@@ -1,7 +1,5 @@
-import type { SchoolId } from "@/theme/schools";
-
-export type Audience = "everyone" | "parents" | "students";
-export type PostType = "text" | "photo" | "event" | "poll" | "alert";
+export type Audience = 'everyone' | 'parents' | 'students';
+export type PostType = 'text' | 'photo' | 'event' | 'poll' | 'alert';
 
 export interface PollOption {
   id: string;
@@ -12,7 +10,6 @@ export interface PollOption {
 
 export interface Post {
   id: string;
-  schoolId: SchoolId;
   type: PostType;
   pinned: boolean;
   audience: Audience;
@@ -20,32 +17,19 @@ export interface Post {
   title: string;
   body: string;
   postedAt: string; // ISO date
-  // Only present on type "event" (and may also appear on the Calendar screen).
-  eventDate?: string; // ISO date
+  eventDate?: string; // ISO date, type "event"
+  eventTime?: string; // e.g. "7:00 PM"
   eventLocation?: string;
-  // Only present on type "photo" — a tint + icon stand in for a real photo.
-  photoIcon?: "trophy" | "building" | "book" | "art";
-  // Only present on type "poll".
+  photoIcon?: 'trophy' | 'heart' | 'flask' | 'music';
   pollOptions?: PollOption[];
-  // Seeded like count, so Feed doesn't look brand new.
   baseLikes: number;
-  // Seeded mock comments shown on the detail screen.
   comments: { author: string; body: string }[];
 }
 
-export interface StaffMember {
+export interface Office {
   id: string;
-  schoolId: SchoolId;
   name: string;
-  role: string;
-  department: string;
-  email: string;
+  detail: string;
   phone: string;
-}
-
-export interface QuickLink {
-  id: string;
-  schoolId: SchoolId;
-  label: string;
-  url: string;
+  email: string;
 }
