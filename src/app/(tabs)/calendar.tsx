@@ -24,6 +24,7 @@ export default function Calendar() {
 
   return (
     <Page title="Calendar">
+      <Text style={T.meta}>Sample content, not real NSHA information.</Text>
       {[...months.entries()].map(([month, list], mi) => (
         <Section key={month} title={month} first={mi === 0}>
           {list.map((it, i) =>

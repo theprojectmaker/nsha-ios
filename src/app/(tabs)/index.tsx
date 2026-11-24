@@ -8,7 +8,8 @@ import Svg, { Defs, LinearGradient, Rect, Stop } from 'react-native-svg';
 import { GAMES, sortedPosts, upcomingEvents } from '@/data/seed';
 import { usePrefs, visibleTo } from '@/prefs';
 import { C, F, GUTTER, T } from '@/theme';
-import { EventRow, NewsRow, ScoreRow, Scroller, Section, greeting, hebrewDate, tap } from '@/ui';
+import { EventRow, NewsRow, ScoreRow, Scroller, Section, greeting, tap } from '@/ui';
+import { hebrewDateNow } from '@/jewish';
 
 export default function Home() {
   const insets = useSafeAreaInsets();
@@ -20,7 +21,7 @@ export default function Home() {
   const latest = posts.filter((p) => p.type !== 'alert').slice(0, 3);
   const games = [...GAMES].sort((a, b) => b.date.localeCompare(a.date)).slice(0, 3);
   const now = new Date();
-  const heb = hebrewDate(now);
+  const heb = hebrewDateNow(now);
   const lionW = Math.min(width * 0.62, 300);
 
   return (
@@ -54,6 +55,7 @@ export default function Home() {
       <View style={s.goldLine} />
 
       <View style={s.col}>
+        <Text style={[T.meta, { marginTop: 16 }]}>Preview: posts, events and scores are samples, not real NSHA information.</Text>
         {alert ? (
           <Pressable onPress={() => { tap(); router.push(`/post/${alert.id}`); }} accessibilityRole="button" accessibilityLabel={alert.title} style={({ pressed }) => [s.alert, pressed && { opacity: 0.7 }]}>
             <Ionicons name="alert-circle" size={22} color={C.red} />

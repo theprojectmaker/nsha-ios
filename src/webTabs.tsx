@@ -11,6 +11,7 @@ const ITEMS: Record<string, { label: string; icon: IconName; on: IconName }> = {
   index: { label: 'Home', icon: 'home-outline', on: 'home' },
   news: { label: 'News', icon: 'newspaper-outline', on: 'newspaper' },
   calendar: { label: 'Calendar', icon: 'calendar-outline', on: 'calendar' },
+  jewish: { label: 'Siddur', icon: 'book-outline', on: 'book' },
   school: { label: 'School', icon: 'school-outline', on: 'school' },
 };
 
@@ -40,6 +41,7 @@ export function WebTabs() {
       <Tabs.Screen name="index" />
       <Tabs.Screen name="news" />
       <Tabs.Screen name="calendar" />
+      <Tabs.Screen name="jewish" />
       <Tabs.Screen name="school" />
     </Tabs>
   );

@@ -45,6 +45,7 @@ export default function PostPage() {
       </View>
 
       <ScrollView contentContainerStyle={s.col} keyboardDismissMode="interactive">
+        <Text style={[T.meta, { marginBottom: 10 }]}>Sample post, not real NSHA information.</Text>
         <PostBody post={post} />
         <Section title={`Comments (${comments.length})`}>
           {comments.map((c, i) => <Row key={i} title={c.author} sub={c.body} last={i === comments.length - 1} />)}

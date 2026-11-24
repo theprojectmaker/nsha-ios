@@ -28,16 +28,6 @@ export function inDays(iso: string, now = new Date()) {
   return n <= 0 ? 'Today' : n === 1 ? 'Tomorrow' : `In ${n} days`;
 }
 
-// e.g. "12 Kislev 5787". Not every phone's date library has the Hebrew calendar; then it's left out.
-export function hebrewDate(d = new Date()) {
-  try {
-    const s = new Intl.DateTimeFormat('en-u-ca-hebrew', { day: 'numeric', month: 'long', year: 'numeric' }).format(d);
-    return /\d{4}/.test(s) && !s.includes(String(d.getFullYear())) ? s : '';
-  } catch {
-    return '';
-  }
-}
-
 export function Scroller({ top, bottom, children }: { top: number; bottom: number; children: React.ReactNode }) {
   const [refreshing, setRefreshing] = useState(false);
   const onRefresh = () => {
@@ -88,6 +78,21 @@ export function Section({ title, action, onAction, children, first }: { title: s
         ) : null}
       </View>
       {children}
+    </View>
+  );
+}
+
+export function Segments({ options, value, onChange }: { options: readonly string[]; value: string; onChange: (v: string) => void }) {
+  return (
+    <View style={s.segment}>
+      {options.map((o) => {
+        const on = o === value;
+        return (
+          <Pressable key={o} onPress={() => { tap(); onChange(o); }} accessibilityRole="tab" accessibilityState={{ selected: on }} style={[s.seg, on && s.segOn]}>
+            <Text style={[s.segText, on && { fontWeight: '600' }]} numberOfLines={1}>{o}</Text>
+          </Pressable>
+        );
+      })}
     </View>
   );
 }
@@ -221,6 +226,10 @@ const s = StyleSheet.create({
   row: { flexDirection: 'row', alignItems: 'center', gap: 14 },
   rowText: { flex: 1, flexDirection: 'row', alignItems: 'center', gap: 10, paddingVertical: 13 },
   rule: { borderBottomWidth: StyleSheet.hairlineWidth, borderBottomColor: C.rule },
+  segment: { flexDirection: 'row', backgroundColor: C.soft, borderRadius: 9, padding: 2, marginVertical: 6 },
+  seg: { flex: 1, alignItems: 'center', paddingVertical: 7, paddingHorizontal: 2, borderRadius: 7 },
+  segOn: { backgroundColor: C.page },
+  segText: { fontSize: 14, fontWeight: '500', color: C.ink },
   date: { width: 40, alignItems: 'center' },
   dateMonth: { fontSize: 11, fontWeight: '700', color: C.blue, letterSpacing: 0.6 },
   dateDay: { fontSize: 22, fontWeight: '700', color: C.ink, marginTop: -1 },

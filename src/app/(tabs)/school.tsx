@@ -40,7 +40,7 @@ export default function School() {
         <Row title="Settings" sub="Parent or student view" onPress={() => router.push('/settings')} last />
       </Section>
 
-      <Text style={[T.meta, { marginTop: 24 }]}>Contact details are samples until the school adds its own.</Text>
+      <Text style={[T.meta, { marginTop: 24 }]}>Contacts and divisions are samples until the school adds its own.</Text>
     </Page>
   );
 }

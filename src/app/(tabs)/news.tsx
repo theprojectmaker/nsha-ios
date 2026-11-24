@@ -19,6 +19,7 @@ export default function News() {
 
   return (
     <Page title="News">
+      <Text style={T.meta}>Sample content, not real NSHA information.</Text>
       {/* Apple-style segmented control */}
       <View style={s.segment}>
         {FILTERS.map((f) => {
